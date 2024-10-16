@@ -1,32 +1,21 @@
 #!/bin/bash
 
-getargs () {
-    while getopts c
-    do
-        echo "enter your cloudflare email:"
-        read -r CLOUDFLARE_EMAIL
-
-        echo "enter your api key:"
-        read -r CLOUDFLARE_API_KEY
-
-        echo "enter your zone id"
-        read -r ZONE_ID
-    done
-}
-
 addrecord () {
-    curl https://api.cloudflare.com/client/v4/zones/"$ZONE_ID"/dns_records \
+    # shellcheck disable=SC2016
+    echo "enter the subdomain you would like to use eg. name from name.domain.com:"
+    read -r NAME
+    curl https://api.cloudflare.com/client/v4/zones/<zone-id>/dns_records \
         -H 'Content-Type: application/json' \
-        -H "X-Auth-Email: $CLOUDFLARE_EMAIL" \
-        -H "X-Auth-Key: $CLOUDFLARE_API_KEY" \
+        -H 'X-Auth-Email: <your-email>' \
+        -H 'X-Auth-Key: <your-global-api-key>' \
         -d '{
-          "content": "<traefik-proxy-ip>",
+          "name": "'"$NAME"'",
+          "content": "ip-or-hostname-of-traefik-host",
           "type": "CNAME"
         }'
 }
 
 main () {
-    getargs
     addrecord
 }
 
